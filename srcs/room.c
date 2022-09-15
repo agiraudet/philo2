@@ -6,11 +6,18 @@
 /*   By: agiraude <agiraude@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/05 14:18:30 by agiraude          #+#    #+#             */
-/*   Updated: 2022/09/15 18:04:35 by agiraude         ###   ########.fr       */
+/*   Updated: 2022/09/15 18:50:51 by agiraude         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+int	free_elem(void *elem)
+{
+	free(elem);
+	elem = 0;
+	return (0);
+}
 
 void	*room_create_philo(int id, t_rules *ruleset, t_death *death)
 {

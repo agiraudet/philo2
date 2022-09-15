@@ -6,7 +6,7 @@
 /*   By: agiraude <agiraude@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/02 16:25:27 by agiraude          #+#    #+#             */
-/*   Updated: 2022/09/15 18:16:56 by agiraude         ###   ########.fr       */
+/*   Updated: 2022/09/15 18:54:02 by agiraude         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,9 +71,7 @@ int	philo_is_alive(t_philo *self)
 		msg_put(self, ms, "died");
 		return (0);
 	}
-//	pthread_mutex_lock(&self->death->lock);
 	dead = self->death->dead;
-//	pthread_mutex_unlock(&self->death->lock);
 	if (dead || philo_are_fat(self->ruleset))
 	{
 		forkmaster_tell(self);

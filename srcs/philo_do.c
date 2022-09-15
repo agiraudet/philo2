@@ -6,7 +6,7 @@
 /*   By: agiraude <agiraude@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/02 16:25:27 by agiraude          #+#    #+#             */
-/*   Updated: 2022/09/15 18:30:32 by agiraude         ###   ########.fr       */
+/*   Updated: 2022/09/15 18:54:18 by agiraude         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,10 +42,6 @@ void	philo_sleep(t_philo *self)
 
 	ms = time_getstamp(self->ruleset);
 	self->last_sleep = ms;
-	/*
-	if (!philo_is_alive(self))
-		return ;
-		*/
 	msg_put(self, ms, "is sleeping");
 	philo_wait(self, self->ruleset->tm_to_sleep);
 }
@@ -57,12 +53,7 @@ void	philo_think(t_philo *self)
 	long int	tm_to_live;
 
 	ms = time_getstamp(self->ruleset);
-	/*
-	if (!philo_is_alive(self))
-		return ;
-		*/
 	msg_put(self, ms, "is thinking");
-	
 	will_die = 0;
 	tm_to_live = philo_thinking_time(self, ms, &will_die);
 	if (tm_to_live > 0)

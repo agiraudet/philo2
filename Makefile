@@ -6,9 +6,10 @@
 #    By: agiraude <agiraude@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/02/06 15:43:27 by agiraude          #+#    #+#              #
-#    Updated: 2022/09/15 15:06:09 by agiraude         ###   ########.fr        #
+#    Updated: 2022/09/15 18:44:13 by agiraude         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
+
 NAME			=	philo
 
 INC_DIR			=	-I includes/ 
@@ -29,8 +30,7 @@ SRCS			=	$(addprefix $(SRCS_DIR), $(SRCS_FILE))
 
 OBJS			=	$(SRCS:.c=.o)
 
-#CFLAGS			=	-Wall -Wextra -Werror $(INC_DIR) 
-CFLAGS			=	-Wall -Wextra -g $(INC_DIR) 
+CFLAGS			=	-Wall -Wextra -Werror $(INC_DIR) 
 
 CC				=	clang
 
