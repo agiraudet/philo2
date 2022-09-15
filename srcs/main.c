@@ -6,7 +6,7 @@
 /*   By: agiraude <agiraude@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/02 15:55:32 by agiraude          #+#    #+#             */
-/*   Updated: 2022/09/15 12:43:22 by agiraude         ###   ########.fr       */
+/*   Updated: 2022/09/15 12:56:14 by agiraude         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,14 @@ t_rules	*rule_set_init(t_rules *ruleset)
 	if (pthread_mutex_init(&ruleset->clock, NULL) != 0)
 	{
 		pthread_mutex_destroy(&ruleset->talk);
+		free(ruleset->meals);
+		free(ruleset);
+		return (0);
+	}
+	if (pthread_mutex_init(&ruleset->food, NULL) != 0)
+	{
+		pthread_mutex_destroy(&ruleset->talk);
+		pthread_mutex_destroy(&ruleset->clock);
 		free(ruleset->meals);
 		free(ruleset);
 		return (0);

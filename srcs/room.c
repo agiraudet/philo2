@@ -6,7 +6,7 @@
 /*   By: agiraude <agiraude@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/05 14:18:30 by agiraude          #+#    #+#             */
-/*   Updated: 2022/09/15 12:43:37 by agiraude         ###   ########.fr       */
+/*   Updated: 2022/09/15 12:57:35 by agiraude         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,46 +67,13 @@ pthread_t	*room_philolst(t_rules *ruleset, t_fm *forkmaster, t_death *death)
 	}
 	return (philo_lst);
 }
-/*
-pthread_t	*room_philolst(t_rules *ruleset, t_fm *forkmaster, t_death *death)
-{
-	pthread_t	*philo_lst;
-	void		*philo_new;
-	int			i;
 
-	philo_lst = (pthread_t *)malloc(sizeof(pthread_t) * ruleset->nb_philo);
-	if (!philo_lst)
-		return (0);
-	i = 1;
-	while (i <= ruleset->nb_philo)
-	{
-		philo_new = room_create_philo(i, ruleset, forkmaster, death);
-		if (pthread_create(&(philo_lst[i - 1]), NULL, &philo_run, philo_new))
-		{
-			free(philo_lst);
-			return (0);
-		}
-		i += 2;
-	}
-	i = 2;
-	while (i <= ruleset->nb_philo)
-	{
-		philo_new = room_create_philo(i, ruleset, forkmaster, death);
-		if (pthread_create(&(philo_lst[i - 1]), NULL, &philo_run, philo_new))
-		{
-			free(philo_lst);
-			return (0);
-		}
-		i += 2;
-	}
-	return (philo_lst);
-}
-*/
 void	room_cleanup(pthread_t *philo_lst, t_fm *forkmaster,
 		t_death *death, t_rules *ruleset)
 {
 	pthread_mutex_destroy(&ruleset->talk);
 	pthread_mutex_destroy(&ruleset->clock);
+	pthread_mutex_destroy(&ruleset->food);
 	pthread_mutex_destroy(&death->lock);
 	free(ruleset->meals);
 	free(ruleset);
