@@ -1,6 +1,15 @@
 #!/bin/python3
 
 import os
+import sys
+
+default_test = ["10 800 80 80 5",
+                "4 410 200 200 20",
+                "4 700 150 150 5",
+                "1 800 200 200 7",
+                "4 410 200 200 10",
+                "4 310 200 100 5",
+                "2 500 200 200 6"]
 
 class Result:
     def __init__(self):
@@ -17,6 +26,8 @@ class Result:
         self.log = value
 
     def log_add(self, value):
+        if self.log != "":
+            self.log += "\n"
         self.log += value
 
     def log_print(self):
@@ -24,8 +35,9 @@ class Result:
             print(self.log)
 
 class Test:
-    def __init__(self, rules):
+    def __init__(self, rules, philo_path="./philo"):
         self.rules = rules
+        self.philo_path = philo_path
         self.out = []
         self.nb_philo = 0
         self.ck_msg = Result()
@@ -34,7 +46,13 @@ class Test:
         self.ck_death = Result()
         self.stat = {}
 
-    def run(self, mode=0):
+    def run(self, mode="minimal"):
+        if not self.check_path():
+            if mode == "verbose" or mode == "minimal":
+                print("Could not find philo program.")
+            return 0
+        if mode == "verbose" or mode == "minimal":
+            print("Running: {} {}".format(self.philo_path, self.rules))
         self.load()
         self.count_philo()
         self.count_stat()
@@ -42,6 +60,9 @@ class Test:
         self.check_forks()
         self.check_meals()
         self.check_death()
+        if mode == "verbose":
+            self.verbose()
+        return 1
 
     def verbose(self):
         self.ck_msg.log_print()
@@ -52,10 +73,23 @@ class Test:
             print("Average time to eat:", self.stat["time_to_eat"])
         if (self.stat["time_to_sleep"]):
             print("Average time to sleep:", self.stat["time_to_sleep"])
+        print()
+
+    def check_path(self):
+        if os.path.exists(self.philo_path):
+            return 1
+        os.system("make")
+        if os.path.exists(self.philo_path):
+            return 1
+        return 0
 
     def load(self):
-        os.system("./philo {} > .tmp".format(self.rules))
-        with open(".tmp", 'r') as outfile:
+        out_name = '_'.join(self.rules.split())
+        if not os.path.exists("outs"):
+            os.makedirs("outs")
+        cmd = "{} {} > outs/{}".format(self.philo_path, self.rules, out_name)
+        os.system(cmd)
+        with open("outs/{}".format(out_name), 'r') as outfile:
             for line in outfile:
                 self.out.append(line.split())
 
@@ -116,7 +150,7 @@ class Test:
         self.ck_msg.status_set(1)
         for m in self.out:
             if self.check_msg_each(m) != 1:
-                self.ck_msg.log_add("\"{}\": this message seems to be wrongly formatted.\n".format(' '.join(m)))
+                self.ck_msg.log_add("\"{}\": this message seems to be wrongly formatted.".format(' '.join(m)))
             self.ck_msg.status_set(0)
         if self.ck_msg.status_get():
             self.ck_msg.log_set("All messages were correctly formated.")
@@ -204,7 +238,7 @@ class Test:
         total_meal = self.count_meals_total()
         min_meal = self.count_meals_min(each_meals)
         self.ck_meals.status_set(min_meal)
-        self.ck_meals.log_add("{} philosophers have eaten a total of {} meals.\n".format(self.nb_philo, total_meal))
+        self.ck_meals.log_add("{} philosophers have eaten a total of {} meals.".format(self.nb_philo, total_meal))
         self.ck_meals.log_add("philo {} is the smallest eater with {} meals.".format(str(min_meal[1]), str(min_meal[0])))
 
     def get_last_meal(self, id):
@@ -228,16 +262,28 @@ class Test:
             self.ck_death.log_set("No one died.")
         else:
             for d in range(0, len(death_list)):
-                self.ck_death.log_add("Philosopher {} is dead. His last meal was {}ms ago.\n".format(str(death_list[d][0]), str(death_list[d][1])))
-            if out[-1][2] not in "died":
-                self.ck_death.log_add("Something was printed after a death. This is wrong.\n")
+                self.ck_death.log_add("Philosopher {} is dead. His last meal was {}ms ago.".format(str(death_list[d][0]), str(death_list[d][1])))
+            if self.out[-1][2] not in "died":
+                self.ck_death.log_add("Something was printed after a death. This is wrong.")
         if len(death_list) > 1:
-            self.ck_death.log_add("Several philosophers had their death printed. This is not correct.\n")
+            self.ck_death.log_add("Several philosophers had their death printed. This is not correct.")
             self.ck_death.status_set(len(death_list))
 
+def load_test_from_file(filename):
+    test_list = []
+    with open(filename, 'r') as file:
+        for line in file:
+            test_list.append(line.strip())
+    return test_list
+
 def main():
-    test = Test("4 700 150 150 5")
-    test.run()
-    test.verbose()
+    if len(sys.argv) > 1:
+        test_list = load_test_from_file(sys.argv[1])
+    else:
+        test_list = default_test
+    for t in test_list:
+         test = Test(t)
+         test.run("verbose")
+    return 0
 
 main()

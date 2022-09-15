@@ -6,7 +6,7 @@
 /*   By: agiraude <agiraude@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/02 16:25:27 by agiraude          #+#    #+#             */
-/*   Updated: 2022/09/14 18:49:03 by agiraude         ###   ########.fr       */
+/*   Updated: 2022/09/15 12:07:10 by agiraude         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,8 @@ void	philo_eat(t_philo *self)
 
 int	philo_loop(t_philo *self)
 {
+	if (self->id % 2 == 0)
+		philo_wait(self, self->ruleset->tm_to_sleep);
 	while (philo_is_alive(self))
 	{
 		philo_use_fork(self, PICK_FORK);
