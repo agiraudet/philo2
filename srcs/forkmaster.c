@@ -6,7 +6,7 @@
 /*   By: agiraude <agiraude@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/04 15:33:35 by agiraude          #+#    #+#             */
-/*   Updated: 2022/09/15 12:37:20 by agiraude         ###   ########.fr       */
+/*   Updated: 2022/09/15 12:46:08 by agiraude         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,12 +47,12 @@ int forkmaster_ask(t_philo *self)
 {
 	if (self->ruleset->nb_philo == 1)
 	{
-		msg_put(self, time_getstamp(), "has taken a fork");
+		msg_put(self, time_getstamp(&self->ruleset->clock), "has taken a fork");
 		philo_wait(self,  self->ruleset->tm_to_die);
 		pthread_mutex_lock(&self->death->lock);
 		self->death->dead = 1;
 		pthread_mutex_unlock(&self->death->lock);
-		msg_put(self, time_getstamp(), "died");
+		msg_put(self, time_getstamp(&self->ruleset->clock), "died");
 		return (0);
 	}
 	if (self->id % 2 == 1)

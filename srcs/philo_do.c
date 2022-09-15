@@ -6,7 +6,7 @@
 /*   By: agiraude <agiraude@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/02 16:25:27 by agiraude          #+#    #+#             */
-/*   Updated: 2022/09/15 12:07:10 by agiraude         ###   ########.fr       */
+/*   Updated: 2022/09/15 12:50:45 by agiraude         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,9 @@ void	philo_use_fork(t_philo *self, int use)
 		}
 		if (philo_is_alive(self))
 		{
-			msg_put(self, time_getstamp(), "has taken a fork");
+			msg_put(self, time_getstamp(&self->ruleset->clock), "has taken a fork");
 			self->hold[0] = 1;
-			msg_put(self, time_getstamp(), "has taken a fork");
+			msg_put(self, time_getstamp(&self->ruleset->clock), "has taken a fork");
 			self->hold[1] = 1;
 		}
 	}
@@ -41,7 +41,7 @@ void	philo_sleep(t_philo *self)
 {
 	long int	ms;
 
-	ms = time_getstamp();
+	ms = time_getstamp(&self->ruleset->clock);
 	self->last_sleep = ms;
 	if (!philo_is_alive(self))
 		return ;
@@ -55,7 +55,7 @@ void	philo_think(t_philo *self)
 
 	if (self->death->dead)
 		return ;
-	ms = time_getstamp();
+	ms = time_getstamp(&self->ruleset->clock);
 	if (!philo_is_alive(self))
 		return ;
 	msg_put(self, ms, "is thinking");
@@ -67,7 +67,7 @@ void	philo_eat(t_philo *self)
 
 	if (self->death->dead || self->hold[0] == 0 || self->hold[1] == 0)
 		return ;
-	ms = time_getstamp();
+	ms = time_getstamp(&self->ruleset->clock);
 	self->last_meal = ms;
 	pthread_mutex_lock(&self->ruleset->food);
 	self->ruleset->meals[self->id - 1] += 1;
@@ -79,7 +79,7 @@ void	philo_eat(t_philo *self)
 int	philo_loop(t_philo *self)
 {
 	if (self->id % 2 == 0)
-		philo_wait(self, self->ruleset->tm_to_sleep);
+		philo_wait(self, self->ruleset->tm_to_eat);
 	while (philo_is_alive(self))
 	{
 		philo_use_fork(self, PICK_FORK);

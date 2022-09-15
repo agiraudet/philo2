@@ -6,7 +6,7 @@
 /*   By: agiraude <agiraude@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/05 14:18:30 by agiraude          #+#    #+#             */
-/*   Updated: 2022/09/15 11:56:27 by agiraude         ###   ########.fr       */
+/*   Updated: 2022/09/15 12:43:37 by agiraude         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,6 +106,7 @@ void	room_cleanup(pthread_t *philo_lst, t_fm *forkmaster,
 		t_death *death, t_rules *ruleset)
 {
 	pthread_mutex_destroy(&ruleset->talk);
+	pthread_mutex_destroy(&ruleset->clock);
 	pthread_mutex_destroy(&death->lock);
 	free(ruleset->meals);
 	free(ruleset);

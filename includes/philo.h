@@ -6,7 +6,7 @@
 /*   By: agiraude <agiraude@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/02 15:59:07 by agiraude          #+#    #+#             */
-/*   Updated: 2022/09/14 18:45:21 by agiraude         ###   ########.fr       */
+/*   Updated: 2022/09/15 12:46:30 by agiraude         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ typedef struct s_rules
 	int				*meals;
 	pthread_mutex_t	talk;
 	pthread_mutex_t	food;
+	pthread_mutex_t clock;
 }				t_rules;
 
 typedef struct s_fork_master
@@ -90,7 +91,7 @@ int			room_play(t_rules *ruleset);
 int			ft_atoi(const char *nptr);
 int			ft_strisnb(const char *str);
 int			ft_strlen(const char *str);
-long int	time_getstamp(void);
+long int	time_getstamp(pthread_mutex_t *clock);
 char		*ft_strnstr(const char *big, const char *little, size_t len);
 
 #endif

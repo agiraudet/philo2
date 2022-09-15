@@ -6,7 +6,7 @@
 /*   By: agiraude <agiraude@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/02 16:25:27 by agiraude          #+#    #+#             */
-/*   Updated: 2022/09/14 18:46:44 by agiraude         ###   ########.fr       */
+/*   Updated: 2022/09/15 12:49:01 by agiraude         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ int	philo_is_alive(t_philo *self)
 {
 	long int	ms;
 
-	ms = time_getstamp();
+	ms = time_getstamp(&self->ruleset->clock);
 	if (self->ruleset->tm_to_die < ms - self->last_meal)
 	{
 		pthread_mutex_lock(&self->death->lock);
@@ -67,7 +67,7 @@ void	philo_wait(t_philo *self, long int tm_to_wait)
 	{
 		return ;
 	}
-	ms = time_getstamp();
+	ms = time_getstamp(&self->ruleset->clock);
 	if (ms + tm_to_wait > self->last_meal + self->ruleset->tm_to_die)
 	{
 		life = (self->last_meal + self->ruleset->tm_to_die) - ms;
@@ -86,8 +86,8 @@ void	*philo_run(void *self_ptr)
 	if (!self_ptr)
 		return (0);
 	self = (t_philo *)self_ptr;
-	self->last_meal = time_getstamp();
-	self->last_sleep = time_getstamp();
+	self->last_meal = time_getstamp(&self->ruleset->clock);
+	self->last_sleep = time_getstamp(&self->ruleset->clock);
 	philo_loop(self);
 	free(self);
 	return (0);
