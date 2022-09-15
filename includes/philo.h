@@ -6,7 +6,7 @@
 /*   By: agiraude <agiraude@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/02 15:59:07 by agiraude          #+#    #+#             */
-/*   Updated: 2022/09/15 17:23:03 by agiraude         ###   ########.fr       */
+/*   Updated: 2022/09/15 17:56:02 by agiraude         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ typedef struct s_philo
 	int			hold[2];
 	long int	last_meal;
 	long int	last_sleep;
+	long int	tm_of_death;
 	t_rules		*ruleset;
 	t_death		*death;
 }				t_philo;

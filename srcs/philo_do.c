@@ -6,7 +6,7 @@
 /*   By: agiraude <agiraude@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/02 16:25:27 by agiraude          #+#    #+#             */
-/*   Updated: 2022/09/15 17:34:02 by agiraude         ###   ########.fr       */
+/*   Updated: 2022/09/15 18:30:32 by agiraude         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,23 +14,17 @@
 
 void	philo_use_fork(t_philo *self, int use)
 {
+	long int	ms;
+
 	if (use == PICK_FORK)
 	{
-		/*
-		while (philo_is_alive(self))
-		{
-			if (forkmaster_ask(self))
-				break ;
-		}
-		*/
 		forkmaster_ask(self);
-		if (philo_is_alive(self))
+		ms = time_getstamp(self->ruleset);
+		if (ms < self->tm_of_death)
 		{
-			msg_put(self, time_getstamp(self->ruleset),
-					"has taken a fork");
+			msg_put(self, ms, "has taken a fork");
 			self->hold[0] = 1;
-			msg_put(self, time_getstamp(self->ruleset),
-					"has taken a fork");
+			msg_put(self, ms, "has taken a fork");
 			self->hold[1] = 1;
 		}
 	}
@@ -48,8 +42,10 @@ void	philo_sleep(t_philo *self)
 
 	ms = time_getstamp(self->ruleset);
 	self->last_sleep = ms;
+	/*
 	if (!philo_is_alive(self))
 		return ;
+		*/
 	msg_put(self, ms, "is sleeping");
 	philo_wait(self, self->ruleset->tm_to_sleep);
 }
@@ -61,8 +57,10 @@ void	philo_think(t_philo *self)
 	long int	tm_to_live;
 
 	ms = time_getstamp(self->ruleset);
+	/*
 	if (!philo_is_alive(self))
 		return ;
+		*/
 	msg_put(self, ms, "is thinking");
 	
 	will_die = 0;
@@ -87,6 +85,7 @@ void	philo_eat(t_philo *self)
 		return ;
 	ms = time_getstamp(self->ruleset);
 	self->last_meal = ms;
+	self->tm_of_death = ms + self->ruleset->tm_to_die;
 	pthread_mutex_lock(&self->ruleset->food);
 	self->ruleset->meals[self->id - 1] += 1;
 	pthread_mutex_unlock(&self->ruleset->food);

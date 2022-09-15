@@ -6,7 +6,7 @@
 /*   By: agiraude <agiraude@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/02 16:25:27 by agiraude          #+#    #+#             */
-/*   Updated: 2022/09/15 17:25:04 by agiraude         ###   ########.fr       */
+/*   Updated: 2022/09/15 18:16:56 by agiraude         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,12 +92,15 @@ void	philo_wait(t_philo *self, long int tm_to_wait)
 		return ;
 	}
 	ms = time_getstamp(self->ruleset);
-	if (ms + tm_to_wait > self->last_meal + self->ruleset->tm_to_die)
+	if (ms + tm_to_wait > self->tm_of_death)
 	{
-		life = (self->last_meal + self->ruleset->tm_to_die) - ms;
-		life++;
+		life = self->tm_of_death - ms;
 		usleep(life * 1000);
-		philo_is_alive(self);
+		pthread_mutex_lock(&self->death->lock);
+		self->death->dead = 1;
+		pthread_mutex_unlock(&self->death->lock);
+		ms = time_getstamp(self->ruleset);
+		msg_put(self, ms, "died");
 	}
 	else
 		usleep(tm_to_wait * 1000);
@@ -111,7 +114,8 @@ void	*philo_run(void *self_ptr)
 		return (0);
 	self = (t_philo *)self_ptr;
 	self->last_meal = time_getstamp(self->ruleset);
-	self->last_sleep = time_getstamp(self->ruleset);
+	self->last_sleep = self->last_meal;
+	self->tm_of_death = self->last_meal + self->ruleset->tm_to_die;
 	philo_loop(self);
 	free(self);
 	return (0);
