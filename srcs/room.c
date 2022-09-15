@@ -6,14 +6,13 @@
 /*   By: agiraude <agiraude@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/05 14:18:30 by agiraude          #+#    #+#             */
-/*   Updated: 2022/09/15 12:57:35 by agiraude         ###   ########.fr       */
+/*   Updated: 2022/09/15 15:16:27 by agiraude         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	*room_create_philo(int id, t_rules *ruleset,
-		t_fm *forkmaster, t_death *death)
+void	*room_create_philo(int id, t_rules *ruleset, t_death *death)
 {
 	t_philo	*philo;
 
@@ -22,7 +21,6 @@ void	*room_create_philo(int id, t_rules *ruleset,
 		return (0);
 	philo->id = id;
 	philo->ruleset = ruleset;
-	philo->forkmaster = forkmaster;
 	philo->fork_l = id - 1;
 	if (id >= ruleset->nb_philo)
 		philo->fork_r = 0;
@@ -34,18 +32,7 @@ void	*room_create_philo(int id, t_rules *ruleset,
 	return ((void *)philo);
 }
 
-int	room_init(t_fm **forkmaster, t_rules *ruleset, t_death *death)
-{
-	if (pthread_mutex_init(&death->lock, NULL) != 0)
-		return (0);
-	death->dead = 0;
-	*forkmaster = forkmaster_create(ruleset->nb_philo);
-	if (!*forkmaster)
-		return (0);
-	return (1);
-}
-
-pthread_t	*room_philolst(t_rules *ruleset, t_fm *forkmaster, t_death *death)
+pthread_t	*room_philolst(t_rules *ruleset, t_death *death)
 {
 	pthread_t	*philo_lst;
 	void		*philo_new;
@@ -57,7 +44,7 @@ pthread_t	*room_philolst(t_rules *ruleset, t_fm *forkmaster, t_death *death)
 	i = 1;
 	while (i <= ruleset->nb_philo)
 	{
-		philo_new = room_create_philo(i, ruleset, forkmaster, death);
+		philo_new = room_create_philo(i, ruleset, death);
 		if (pthread_create(&(philo_lst[i - 1]), NULL, &philo_run, philo_new))
 		{
 			free(philo_lst);
@@ -68,37 +55,41 @@ pthread_t	*room_philolst(t_rules *ruleset, t_fm *forkmaster, t_death *death)
 	return (philo_lst);
 }
 
-void	room_cleanup(pthread_t *philo_lst, t_fm *forkmaster,
-		t_death *death, t_rules *ruleset)
+void	room_cleanup(pthread_t *philo_lst, t_death *death, t_rules *ruleset)
 {
+	forkmaster_del(ruleset->forks, ruleset->nb_philo);
 	pthread_mutex_destroy(&ruleset->talk);
-	pthread_mutex_destroy(&ruleset->clock);
 	pthread_mutex_destroy(&ruleset->food);
-	pthread_mutex_destroy(&death->lock);
+	if (death)
+		pthread_mutex_destroy(&death->lock);
 	free(ruleset->meals);
 	free(ruleset);
-	free(philo_lst);
-	forkmaster_del(forkmaster);
+	if (philo_lst)
+		free(philo_lst);
 }
 
 int	room_play(t_rules *ruleset)
 {
 	pthread_t	*philo_lst;
-	t_fm		*forkmaster;
 	t_death		death;
 	int			i;
 
-	if (!room_init(&forkmaster, ruleset, &death))
+	if (pthread_mutex_init(&death.lock, NULL) != 0)
+	{
+		room_cleanup(0, 0, ruleset);
 		return (1);
-	philo_lst = room_philolst(ruleset, forkmaster, &death);
+	}
+	death.dead = 0;
+	ruleset->start_time = time_getstamp(ruleset);
+	philo_lst = room_philolst(ruleset, &death);
 	if (!philo_lst)
 	{
-		forkmaster_del(forkmaster);
+		room_cleanup(0, &death, ruleset);
 		return (1);
 	}
 	i = 0;
 	while (i < ruleset->nb_philo)
 		pthread_join(philo_lst[i++], 0);
-	room_cleanup(philo_lst, forkmaster, &death, ruleset);
+	room_cleanup(philo_lst, &death, ruleset);
 	return (0);
 }

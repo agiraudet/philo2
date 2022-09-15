@@ -6,7 +6,7 @@
 #    By: agiraude <agiraude@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/02/06 15:43:27 by agiraude          #+#    #+#              #
-#    Updated: 2022/09/14 18:16:03 by agiraude         ###   ########.fr        #
+#    Updated: 2022/09/15 15:06:09 by agiraude         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 NAME			=	philo
@@ -15,8 +15,8 @@ INC_DIR			=	-I includes/
 
 DEP				=	-pthread
 
-SRCS_FILE		=	forkmaster.c \
-					main.c \
+SRCS_FILE		=	main.c \
+					forkmaster.c \
 					msg.c \
 					philo.c \
 					philo_do.c \
@@ -29,8 +29,8 @@ SRCS			=	$(addprefix $(SRCS_DIR), $(SRCS_FILE))
 
 OBJS			=	$(SRCS:.c=.o)
 
-CFLAGS			=	-Wall -Wextra -g $(INC_DIR)
 #CFLAGS			=	-Wall -Wextra -Werror $(INC_DIR) 
+CFLAGS			=	-Wall -Wextra -g $(INC_DIR) 
 
 CC				=	clang
 

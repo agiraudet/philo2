@@ -6,7 +6,7 @@
 /*   By: agiraude <agiraude@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/02 15:57:46 by agiraude          #+#    #+#             */
-/*   Updated: 2022/09/15 12:45:09 by agiraude         ###   ########.fr       */
+/*   Updated: 2022/09/15 15:15:43 by agiraude         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,19 +56,14 @@ int	ft_strlen(const char *str)
 	return (i);
 }
 
-long int	time_getstamp(pthread_mutex_t *clock)
+long int	time_getstamp(t_rules *ruleset)
 {
 	struct timeval	tm;
-	static long int	start_ms = 0;
 	long int		ms;
 
-	pthread_mutex_lock(clock);
 	gettimeofday(&tm, NULL);
-	pthread_mutex_unlock(clock);
 	ms = tm.tv_sec * 1000 + tm.tv_usec / 1000;
-	if (start_ms == 0)
-		start_ms = ms;
-	return (ms - start_ms);
+	return (ms - ruleset->start_time);
 }
 
 char	*ft_strnstr(const char *big, const char *little, size_t len)

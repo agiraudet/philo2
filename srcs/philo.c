@@ -6,7 +6,7 @@
 /*   By: agiraude <agiraude@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/02 16:25:27 by agiraude          #+#    #+#             */
-/*   Updated: 2022/09/15 12:49:01 by agiraude         ###   ########.fr       */
+/*   Updated: 2022/09/15 15:27:00 by agiraude         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,17 +32,13 @@ int	philo_are_fat(t_rules *ruleset)
 	return (1);
 }
 
-void	philo_letgo(t_philo *self)
-{
-	if (self->hold[0] || self->hold[1])
-		philo_use_fork(self, PUT_FORK);
-}
-
 int	philo_is_alive(t_philo *self)
 {
 	long int	ms;
+	int			dead;
 
-	ms = time_getstamp(&self->ruleset->clock);
+	dead = 0;
+	ms = time_getstamp(self->ruleset);
 	if (self->ruleset->tm_to_die < ms - self->last_meal)
 	{
 		pthread_mutex_lock(&self->death->lock);
@@ -50,9 +46,12 @@ int	philo_is_alive(t_philo *self)
 		pthread_mutex_unlock(&self->death->lock);
 		msg_put(self, ms, "died");
 	}
-	if (self->death->dead || philo_are_fat(self->ruleset))
+	pthread_mutex_lock(&self->death->lock);
+	dead = self->death->dead;
+	pthread_mutex_unlock(&self->death->lock);
+	if (dead || philo_are_fat(self->ruleset))
 	{
-		philo_letgo(self);
+		forkmaster_tell(self);
 		return (0);
 	}
 	return (1);
@@ -67,7 +66,7 @@ void	philo_wait(t_philo *self, long int tm_to_wait)
 	{
 		return ;
 	}
-	ms = time_getstamp(&self->ruleset->clock);
+	ms = time_getstamp(self->ruleset);
 	if (ms + tm_to_wait > self->last_meal + self->ruleset->tm_to_die)
 	{
 		life = (self->last_meal + self->ruleset->tm_to_die) - ms;
@@ -86,8 +85,8 @@ void	*philo_run(void *self_ptr)
 	if (!self_ptr)
 		return (0);
 	self = (t_philo *)self_ptr;
-	self->last_meal = time_getstamp(&self->ruleset->clock);
-	self->last_sleep = time_getstamp(&self->ruleset->clock);
+	self->last_meal = time_getstamp(self->ruleset);
+	self->last_sleep = time_getstamp(self->ruleset);
 	philo_loop(self);
 	free(self);
 	return (0);
