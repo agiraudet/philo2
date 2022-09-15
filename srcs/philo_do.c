@@ -6,7 +6,7 @@
 /*   By: agiraude <agiraude@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/02 16:25:27 by agiraude          #+#    #+#             */
-/*   Updated: 2022/09/15 15:27:34 by agiraude         ###   ########.fr       */
+/*   Updated: 2022/09/15 17:34:02 by agiraude         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,11 +16,14 @@ void	philo_use_fork(t_philo *self, int use)
 {
 	if (use == PICK_FORK)
 	{
+		/*
 		while (philo_is_alive(self))
 		{
 			if (forkmaster_ask(self))
 				break ;
 		}
+		*/
+		forkmaster_ask(self);
 		if (philo_is_alive(self))
 		{
 			msg_put(self, time_getstamp(self->ruleset),
@@ -54,17 +57,26 @@ void	philo_sleep(t_philo *self)
 void	philo_think(t_philo *self)
 {
 	long int	ms;
-	int			dead;
+	int			will_die;
+	long int	tm_to_live;
 
-	pthread_mutex_lock(&self->death->lock);
-	dead = self->death->dead;
-	pthread_mutex_unlock(&self->death->lock);
-	if (dead)
-		return ;
 	ms = time_getstamp(self->ruleset);
 	if (!philo_is_alive(self))
 		return ;
 	msg_put(self, ms, "is thinking");
+	
+	will_die = 0;
+	tm_to_live = philo_thinking_time(self, ms, &will_die);
+	if (tm_to_live > 0)
+		philo_wait(self, tm_to_live);
+	if (will_die)
+	{
+		pthread_mutex_lock(&self->death->lock);
+		self->death->dead = 1;
+		pthread_mutex_unlock(&self->death->lock);
+		msg_put(self, time_getstamp(self->ruleset), "died");
+	}
+	return ;
 }
 
 void	philo_eat(t_philo *self)

@@ -6,11 +6,42 @@
 /*   By: agiraude <agiraude@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/02 15:55:32 by agiraude          #+#    #+#             */
-/*   Updated: 2022/09/15 15:16:21 by agiraude         ###   ########.fr       */
+/*   Updated: 2022/09/15 17:30:10 by agiraude         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+int	rule_set_init_ff(t_rules *ruleset)
+{
+	int	i;
+
+	ruleset->free_fork = (int *)malloc(sizeof(int) * ruleset->nb_philo);
+	if (!ruleset->free_fork)
+		return (0);
+	i = 0;
+	while (i < ruleset->nb_philo)
+		ruleset->free_fork[i++] = 0;
+	ruleset->ff = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * ruleset->nb_philo);
+	if (!ruleset->ff)
+	{
+		free(ruleset->free_fork);
+		return (0);
+	}
+	i = 0;
+	while (i < ruleset->nb_philo)
+	{
+		if (pthread_mutex_init(&ruleset->ff[i], NULL) != 0)
+		{
+			i--;
+			while (i)
+				pthread_mutex_destroy(&ruleset->ff[i--]);
+			return (0);
+		}
+		i++;
+	}
+	return (1);
+}
 
 t_rules	*rule_set_init(t_rules *ruleset)
 {
@@ -28,6 +59,12 @@ t_rules	*rule_set_init(t_rules *ruleset)
 		return (0);
 	}
 	if (pthread_mutex_init(&ruleset->food, NULL) != 0)
+	{
+		pthread_mutex_destroy(&ruleset->talk);
+		free(ruleset->meals);
+		return (0);
+	}
+	if (!rule_set_init_ff(ruleset))
 	{
 		pthread_mutex_destroy(&ruleset->talk);
 		free(ruleset->meals);

@@ -6,7 +6,7 @@
 /*   By: agiraude <agiraude@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/02 15:59:07 by agiraude          #+#    #+#             */
-/*   Updated: 2022/09/15 15:16:05 by agiraude         ###   ########.fr       */
+/*   Updated: 2022/09/15 17:23:03 by agiraude         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,8 @@ typedef struct s_rules
 	pthread_mutex_t	talk;
 	pthread_mutex_t	food;
 	pthread_mutex_t	*forks;
+	pthread_mutex_t	*ff;
+	int				*free_fork;
 }				t_rules;
 
 typedef struct s_death
@@ -71,6 +73,7 @@ void			philo_letgo(t_philo *self);
 int				philo_is_alive(t_philo *self);
 void			philo_wait(t_philo *self, long int tm_to_wait);
 void			*philo_run(void *self_ptr);
+long int	philo_thinking_time(t_philo *self, long int ms, int *will_die);
 
 //srcs/philo_do.c
 void			philo_use_fork(t_philo *self, int use);

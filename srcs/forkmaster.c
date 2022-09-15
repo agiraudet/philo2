@@ -6,7 +6,7 @@
 /*   By: agiraude <agiraude@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/04 15:33:35 by agiraude          #+#    #+#             */
-/*   Updated: 2022/09/15 15:13:03 by agiraude         ###   ########.fr       */
+/*   Updated: 2022/09/15 16:58:45 by agiraude         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,11 +18,17 @@ void	fork_take(t_philo *self, int dir)
 	{
 		pthread_mutex_lock(&self->ruleset->forks[self->fork_l]);
 		self->hold[0] = 1;
+		pthread_mutex_lock(&self->ruleset->ff[self->fork_l]);
+		self->ruleset->free_fork[self->fork_l] = time_getstamp(self->ruleset) + self->ruleset->tm_to_eat;
+		pthread_mutex_unlock(&self->ruleset->ff[self->fork_l]);
 	}
 	else
 	{
 		pthread_mutex_lock(&self->ruleset->forks[self->fork_r]);
 		self->hold[1] = 1;
+		pthread_mutex_lock(&self->ruleset->ff[self->fork_r]);
+		self->ruleset->free_fork[self->fork_r] = time_getstamp(self->ruleset) + self->ruleset->tm_to_eat;
+		pthread_mutex_unlock(&self->ruleset->ff[self->fork_r]);
 	}
 }
 
@@ -48,7 +54,6 @@ int forkmaster_ask(t_philo *self)
 		fork_take(self, LEFT);
 	return (1);
 }
-
 
 void	forkmaster_tell(t_philo *self)
 {
@@ -89,10 +94,8 @@ pthread_mutex_t	*forkmaster_create(int n)
 		{
 			i--;
 			while (i)
-			{
 				pthread_mutex_destroy(&forks[i--]);
-				return (0);
-			}
+			return (0);
 		}
 		i++;
 	}

@@ -6,7 +6,7 @@
 /*   By: agiraude <agiraude@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/05 14:18:30 by agiraude          #+#    #+#             */
-/*   Updated: 2022/09/15 15:16:27 by agiraude         ###   ########.fr       */
+/*   Updated: 2022/09/15 17:32:28 by agiraude         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,9 +57,16 @@ pthread_t	*room_philolst(t_rules *ruleset, t_death *death)
 
 void	room_cleanup(pthread_t *philo_lst, t_death *death, t_rules *ruleset)
 {
+	int	i;
+
 	forkmaster_del(ruleset->forks, ruleset->nb_philo);
 	pthread_mutex_destroy(&ruleset->talk);
 	pthread_mutex_destroy(&ruleset->food);
+	i = 0;
+	while (i < ruleset->nb_philo)
+		pthread_mutex_destroy(&ruleset->ff[i++]);
+	free(ruleset->ff);
+	free(ruleset->free_fork);
 	if (death)
 		pthread_mutex_destroy(&death->lock);
 	free(ruleset->meals);
