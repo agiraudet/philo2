@@ -6,12 +6,13 @@
 /*   By: agiraude <agiraude@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/04 15:33:35 by agiraude          #+#    #+#             */
-/*   Updated: 2022/09/15 12:04:36 by agiraude         ###   ########.fr       */
+/*   Updated: 2022/09/15 12:37:20 by agiraude         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
+/*
 int	forkmaster_ask(t_philo *self)
 {
 	t_fm	*fkm;
@@ -40,18 +41,39 @@ int	forkmaster_ask(t_philo *self)
 	pthread_mutex_unlock(&(fkm->lock));
 	return (1);
 }
+*/
+
+int forkmaster_ask(t_philo *self)
+{
+	if (self->ruleset->nb_philo == 1)
+	{
+		msg_put(self, time_getstamp(), "has taken a fork");
+		philo_wait(self,  self->ruleset->tm_to_die);
+		pthread_mutex_lock(&self->death->lock);
+		self->death->dead = 1;
+		pthread_mutex_unlock(&self->death->lock);
+		msg_put(self, time_getstamp(), "died");
+		return (0);
+	}
+	if (self->id % 2 == 1)
+		pthread_mutex_lock(&self->forkmaster->forks[self->fork_l]);
+	else
+		pthread_mutex_lock(&self->forkmaster->forks[self->fork_r]);
+	if (self->id % 2 == 1)
+		pthread_mutex_lock(&self->forkmaster->forks[self->fork_r]);
+	else
+		pthread_mutex_lock(&self->forkmaster->forks[self->fork_l]);
+	return (1);
+}
+
 
 void	forkmaster_tell(t_philo *self)
 {
 	t_fm	*forkmaster;
 
 	forkmaster = self->forkmaster;
-	pthread_mutex_lock(&(forkmaster->lock));
 	pthread_mutex_unlock(&forkmaster->forks[self->fork_l]);
 	pthread_mutex_unlock(&forkmaster->forks[self->fork_r]);
-	forkmaster->status[self->fork_l] = 1;
-	forkmaster->status[self->fork_r] = 1;
-	pthread_mutex_unlock(&(forkmaster->lock));
 }
 
 void	forkmaster_del(t_fm *forkmaster)
